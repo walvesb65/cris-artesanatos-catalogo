@@ -38,6 +38,8 @@ No TiDB, normalmente o deploy usa:
 MYSQL_SSL=true
 ```
 
+No Render, `MYSQL_SSL=true` deve ficar nas variaveis do servico da API, nao na Netlify.
+
 ## 3. Criar a API no Render
 
 1. Acesse `https://render.com`.

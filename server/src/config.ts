@@ -23,15 +23,21 @@ const booleanFromEnv = (value: string | undefined) => {
   return ["1", "true", "yes", "on"].includes(String(value).toLowerCase());
 };
 
+const dbHost = process.env.MYSQL_HOST ?? process.env.DB_HOST ?? "127.0.0.1";
+const dbPort = numberFromEnv(process.env.MYSQL_PORT ?? process.env.DB_PORT, 3306);
+const dbUsesSsl =
+  booleanFromEnv(process.env.MYSQL_SSL ?? process.env.DB_SSL ?? process.env.TIDB_SSL) ||
+  dbHost.includes("tidbcloud.com");
+
 export const config = {
   port: numberFromEnv(process.env.PORT, 3333),
   db: {
-    host: process.env.MYSQL_HOST ?? process.env.DB_HOST ?? "127.0.0.1",
-    port: numberFromEnv(process.env.MYSQL_PORT ?? process.env.DB_PORT, 3306),
+    host: dbHost,
+    port: dbPort,
     user: process.env.MYSQL_USER ?? process.env.DB_USERNAME ?? process.env.DB_USER ?? "cris_user",
     password: process.env.MYSQL_PASSWORD ?? process.env.DB_PASSWORD ?? "cris_password",
     database: process.env.MYSQL_DATABASE ?? process.env.DB_DATABASE ?? "cris_catalogo",
-    ssl: booleanFromEnv(process.env.MYSQL_SSL) ? { rejectUnauthorized: true } : undefined
+    ssl: dbUsesSsl ? { minVersion: "TLSv1.2", rejectUnauthorized: true } : undefined
   },
   jwtSecret: process.env.JWT_SECRET ?? "dev-secret-change-me",
   admin: {
